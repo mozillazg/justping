@@ -1,2 +1,4 @@
 
 /pingtest.py
+*.swp
+/test.py
