@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""通过 ping 命令找出连接时间最短的 ip 或域名
+"""通过 ping 命令找出响应时间最快的 ip 或域名
 只支持 windows
 """
 
@@ -14,8 +14,8 @@ def ping(host):
     返回 host, ip, time, lost
         host：域名，字符串类型
         ip：字符串类型，默认值为'0.0.0.0'
-        time：所用时间（ms），int 类型，默认值为0
-        lost：丢包率（%），int 类型，默认值为0
+        time：平均响应时间（ms），int 类型，默认值为0
+        lost：平均丢包率（%），int 类型，默认值为0
     返回值示例：
         ('www.baidu.com', '0.0.0.0', 0, 0)
     """
@@ -28,7 +28,7 @@ def ping(host):
     # 'a$' 匹配 'a\r\n' 中的 'a\r'
     text = out.replace('\r\n', '\n')
     ip = '0.0.0.0'
-    lost = time = 0
+    lost, time = 0, 0
     try:
         # 使用正则表达式提取信息
         ip = re.search(r'^\d+\.\d+\.\d+\.\d+\b', text, re.M).group()
@@ -45,7 +45,7 @@ def get_hosts(filename):
     hosts = list()
     with open(filename) as f:
         for line in f:
-            line = line.strip()
+            line = line.strip().strip('.,/')
             if line:
                 hosts.append(line)
     return hosts
@@ -53,14 +53,31 @@ def get_hosts(filename):
 if __name__ == '__main__':
     import sys
     import os
+    import re
     # 处理命令行参数
-    if len(sys.argv) == 2:
-        filename = sys.argv[1].strip()
-    else:
-        filename = 'hosts.txt'
-    if not os.path.isfile(filename):
-        sys.exit('The file("%s") not existed!' % (filename))
-    hosts = get_hosts(filename)
+    argvs = sys.argv
+    leng = len(argvs)
+    hosts = list()
+    filename = 'hosts.txt'
+    if leng >= 2:
+        name = argvs[1].strip()
+        if os.path.isfile(name):
+            filename = name
+        else:
+            for s in argvs[1:]:
+                name = s.strip().strip('.,/')
+                name = re.sub(r'https?://', '', name)
+                hosts.append(name)
+    if not hosts and not os.path.isfile(filename):
+        sys.exit('No ip or the file("%s") not existed!' % (filename))
+    if not hosts:
+        hosts = get_hosts(filename)
+    # TODO justping.py test.txt + baidu.com
+    # justping.py + baidu.com
+    # else:
+        # hosts = list(set(get_hosts(filename) + hosts))
+    if not hosts:
+        sys.exit('Not find ip/host')
     result_time = dict()
     print '#' * 50
     print 'host(ip)'.rjust(30), 'time    lost'.rjust(14)
@@ -76,4 +93,6 @@ if __name__ == '__main__':
         for k, v in result_time.iteritems():
             if v == times[0]:
                 print '%s has the min ping time: %s ms' % (k, v)
+    # else:
+        # print 'The ping result are timeout'
     raw_input('>')
