@@ -59,32 +59,44 @@ if __name__ == '__main__':
     leng = len(argvs)
     hosts = list()
     filename = 'hosts.txt'
+    add = False
+    ips = list()
     if leng >= 2:
-        name = argvs[1].strip()
+        name = argvs[1]
         if os.path.isfile(name):
             filename = name
+            if leng > 2:
+                if argvs[2] == '+':
+                    add = True
+                    ips = argvs[3:]
+                else:
+                    ips = argvs[2:]
         else:
-            for s in argvs[1:]:
-                name = s.strip().strip('.,/')
+            if name == '+':
+                add = True
+                ips = argvs[2:]
+            else:
+                ips = argvs[1:]
+        if ips:
+            for s in ips:
+                name = s.strip('.,/')
                 name = re.sub(r'https?://', '', name)
                 hosts.append(name)
     if not hosts and not os.path.isfile(filename):
         sys.exit('No ip or the file("%s") not existed!' % (filename))
     if not hosts:
         hosts = get_hosts(filename)
-    # TODO justping.py test.txt + baidu.com
-    # justping.py + baidu.com
-    # else:
-        # hosts = list(set(get_hosts(filename) + hosts))
+    if add:
+        hosts = list(set(get_hosts(filename) + hosts))
     if not hosts:
         sys.exit('Not find ip/host')
     result_time = dict()
     print '#' * 50
-    print 'host(ip)'.rjust(30), 'time    lost'.rjust(14)
+    print 'host(ip)'.rjust(33), 'time    lost'.rjust(14)
     for x in hosts:
         host, ip, time, lost = ping(x)
         result_time.update({host: time})
-        print ('%s(%s): ' % (host, ip)).rjust(32), ('% 3sms   % 2s%%'
+        print ('%s(%s): ' % (host, ip)).rjust(35), ('% 3sms   % 2s%%'
                                                     ) % (time, lost)
     times = sorted(result_time.itervalues())
     times = [i for i in times[:] if i]
