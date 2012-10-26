@@ -5,7 +5,7 @@
 **justping.py** [*filename*] [**+**] [*ip/host*...]
 
 ### 参数
-*filename* ------ 内容为一行一个 ip/域名的文件    
+*filename* ------ 内容为一行一个 ip/域名的文件，参考 hosts.txt    
 **+** ---------------- 同时比较文件内及后面输入的 ip/域名    
 *ip/host* -------- ip/域名
 
