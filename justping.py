@@ -9,13 +9,16 @@ import subprocess
 
 def ping(host):
     """返回 ping 结果
+
     host 参数应为字符串类型的 ip 或域名
         '192.168.1.1' or 'www.baidu.com'
+
     返回 host, ip, time, lost
         host：域名或 ip，字符串类型
         ip：ip 地址，字符串类型，默认值为'0.0.0.0'
         time：平均响应时间（ms），int 类型，默认值为0
         lost：平均丢包率（%），int 类型，默认值为0
+
     返回值示例：
         ('baidu.com', '123.125.114.144', 70, 0)
     """
@@ -48,6 +51,7 @@ def ping(host):
 
 def get_hosts(filename):
     """从文件中读取 ip/域名
+    返回 ip/列表，默认值为空
     """
     hosts = list()
     with open(filename) as f:
