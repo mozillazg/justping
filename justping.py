@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""通过 ping 命令找出响应时间最快的 ip 或域名
+"""通过 ping 命令找出响应时间最短的 ip 或域名
 支持 windows，uinx，linux
 """
 
@@ -29,10 +29,13 @@ def ping(host):
     if os_name == 'nt':  # windows
         cmd = 'ping ' + host
     else:  # unix/linux
-        cmd = 'ping -c r ' + host
-    # 执行 ping 命令，并获取命令执行结果
-    sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        cmd = 'ping -c 4 ' + host
+    # 执行 ping 命令
+    sub = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE, shell=True)
     out = sub.communicate()[0]
+    if not out:
+        return host, '0.0.0.0', 0, 100
     # 替换换行符，因为在正则表达式中
     # 'a$' 匹配 'a\r\n' 中的 'a\r'
     text = out.replace('\r\n', '\n').replace('\r', '\n')
@@ -44,8 +47,8 @@ def ping(host):
         time = re.findall(r'(?<=\d/)[\d\.]+(?=/)', text)
     lost = re.findall(r'\d+(?=%)', text)
     ip = ip[0] if ip else '0.0.0.0'
-    time = int(time[0]) if time else 0
-    lost = int(lost[0]) if lost else 0
+    time = int(str(time[0])) if time else 0
+    lost = int(str(lost[0])) if lost else 0
     return host, ip, time, lost
 
 
@@ -109,20 +112,21 @@ if __name__ == '__main__':
     if not hosts:
         sys.exit('Not find ip/host')
     result_time = dict()
-    print '#' * 50
+    print '#' * 55
     # 固定字符串长度
-    print 'host(ip)'.rjust(33), 'time    lost'.rjust(14)
+    print 'host(ip)'.rjust(33), 'time'.rjust(8), 'lost'.rjust(8)
     for x in hosts:
         host, ip, time, lost = ping(x)
         result_time.update({host: time})
         if time == 0:
             lost = 100
-        print ('%s(%s): ' % (host, ip)).rjust(35), ('% 3sms   % 2s%%'
-                                                    ) % (time, lost)
+        print ('%s(%s): ' % (host, ip)).rjust(35),\
+              ('% 3sms' % (time)).rjust(6),\
+              ('% 2s%%' % (lost)).rjust(8)
     times = sorted(result_time.itervalues())
     # 去除 time 为0的
     times = [i for i in times[:] if i]
-    print '#' * 50
+    print '#' * 55
     if times:
         for k, v in result_time.iteritems():
             if v == times[0]:

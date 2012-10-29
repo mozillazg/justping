@@ -2,7 +2,7 @@
 通过解析 ping 命令执行结果，查找 ping 值最小的 ip/域名
 
 ## 用法
-**justping.py** [ *filename* ] [ **+** ] [ *ip/host* ...]
+**justping.py** [ *filename* ] [ **+** ] [ *ip/host* ]...
 
 ### 参数
 *filename* ------ 内容为一行一个 ip/域名的文件，参考 hosts.txt    
