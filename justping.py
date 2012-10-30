@@ -47,8 +47,9 @@ def ping(host):
         time = re.findall(r'(?<=\d/)[\d\.]+(?=/)', text)
     lost = re.findall(r'\d+(?=%)', text)
     ip = ip[0] if ip else '0.0.0.0'
-    time = int(str(time[0])) if time else 0
-    lost = int(str(lost[0])) if lost else 0
+    # 小数点四舍五入
+    time = int(round(float(time[0]))) if time else 0
+    lost = int(round(float(lost[0]))) if lost else 0
     return host, ip, time, lost
 
 
@@ -131,4 +132,4 @@ if __name__ == '__main__':
         for k, v in result_time.iteritems():
             if v == times[0]:
                 print '%s has the min ping time: %s ms' % (k, v)
-    raw_input('>')
+    # raw_input('>')
