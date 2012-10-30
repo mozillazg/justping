@@ -105,8 +105,10 @@ if __name__ == '__main__':
     if not hosts and not os.path.isfile(filename):
         sys.exit('No ip/host or the file("%s") not existed!' % (filename))
     if not hosts:
-        hosts = get_hosts(filename)
+        # 移除重复项
+        hosts = list(set(get_hosts(filename)))
     else:
+        hosts = list(set(hosts))
         # 如果包含 + 参数，合并 ip/域名信息
         if add:
             hosts = list(set(get_hosts(filename) + hosts))
