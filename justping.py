@@ -40,7 +40,7 @@ def ping(host):
     # 'a$' 匹配 'a\r\n' 中的 'a\r'
     text = out.replace('\r\n', '\n').replace('\r', '\n')
     # 使用正则
-    ip = re.findall(r'(?<=\(|\[)\d+\.\d+\.\d+\.\d+(?=\(|\])', text)
+    ip = re.findall(r'(?<=\(|\[)\d+\.\d+\.\d+\.\d+(?=\)|\])', text)
     if os_name == 'nt':
         time = re.findall(r'\d+(?=ms$)', text)
     else:
